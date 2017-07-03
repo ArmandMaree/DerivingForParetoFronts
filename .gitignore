@@ -27,3 +27,7 @@
 *.exe
 *.out
 *.app
+
+# Gradle folders
+src/.gradle
+src/build
