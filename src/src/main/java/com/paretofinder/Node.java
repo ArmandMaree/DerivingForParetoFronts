@@ -25,10 +25,8 @@ public class Node {
 			case CONSTANT_NODE:
 				return new ConstantNode(minRange, maxRange);
 			default:
-				System.out.println("nodeType: " + nodeType + " not legal!");
+				throw new RuntimeException("nodeType: " + nodeType + " not legal!");
 		}
-
-		return null;
 	}
 
 	public static Node getRandomNode() {
@@ -44,10 +42,8 @@ public class Node {
 			case CONSTANT_NODE:
 				return new ConstantNode(minRange, maxRange);
 			default:
-				System.out.println("nodeType: " + nodeType + " not legal!");
+				throw new RuntimeException("nodeType: " + nodeType + " not legal leaf node!");
 		}
-
-		return null;
 	}
 
 	public static double getVariableValue(int pointIndex, String variableName) {
@@ -63,11 +59,15 @@ public class Node {
 	}
 
 	public Node clone() {
-		return null;
+		throw new RuntimeException("clone not implemented for " + this.getClass().getName() + ".");
+	}
+
+	public double cleanUp() throws CannotReduceException {
+		throw new RuntimeException("Node reduction not implemented for " + this.getClass().getName());
 	}
 
 	@Override
 	public String toString() {
-		return "NODE";
+		throw new RuntimeException("toString not implemented for " + this.getClass().getName() + ".");
 	}
 }

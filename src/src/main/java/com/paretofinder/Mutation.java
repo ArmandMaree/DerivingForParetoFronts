@@ -3,9 +3,9 @@ package com.paretofinder;
 import java.util.Random;
 
 public class Mutation {
-	public static double mutationProbability = 0.05;
-	public static double modifyNodeProbability = 1.0;
-	public static double adaptNodeProbability = 1.0 - modifyNodeProbability;
+	public static final double mutationProbability = 0.3;
+	public static final double modifyNodeProbability = 0.5; // higher will result in more radical changes
+	public static final double adaptNodeProbability = 1.0 - modifyNodeProbability;
 	private static Random rand = new Random();
 
 	public static void mutate(Individual individual, Individual bestIndividual) {
@@ -14,6 +14,7 @@ public class Mutation {
 		for (int i = 0; i < individual.size(); i++) {
 			if (rand.nextDouble() < mutationProbability) { // mutate gene
 				double mutationTypeProbability = rand.nextDouble();
+				// System.out.println("Changing " + i + "      " + mutationTypeProbability  + "    " + adaptNodeProbability);
 
 				if (mutationTypeProbability <  adaptNodeProbability) {
 					Node node = individual.getNode(i);
@@ -21,13 +22,12 @@ public class Mutation {
 					if (node instanceof ConstantNode) {
 						ConstantNode cNode = (ConstantNode)node;
 
-						double newValue = cNode.getValue(i) + (rand.nextDouble() * 2.0 - 1.0); // value + U(-1, 1)
-						cNode.setValue(newValue);
-						changed = true;
-					}
-					else if (node instanceof VariableNode) {
-						node.randomize();
-						changed = true;
+						if (individual.getFitness() > bestIndividual.getFitness()) {
+							double newValue = cNode.getValue(i) + (Node.maxRange - Node.minRange) * (bestIndividual.getFitness() / individual.getFitness()) * (rand.nextDouble() * 2 - 1);
+							cNode.setValue(newValue);
+							changed = true;
+							// System.out.println("Changed Const by: " + newValue + "    " + (bestIndividual.getFitness() / individual.getFitness()));
+						}
 					}
 				}
 				else if (mutationTypeProbability < adaptNodeProbability + modifyNodeProbability) {  // elseif to ensure future scalability

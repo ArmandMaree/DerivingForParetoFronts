@@ -25,8 +25,21 @@ public class CrossOver {
 		// System.out.println("Node1: \n" + node1);
 		// System.out.println("Node2: \n" + node2);
 
-		child1.setNode(p1COPoint, node2);
-		child2.setNode(p2COPoint, node1);
+		try {
+			child1.setNode(p1COPoint, node2);
+		}
+		catch (NullPointerException e) {
+			System.out.println("p2COPoint: " + p2COPoint);
+			throw e;
+		}
+
+		try {
+			child2.setNode(p2COPoint, node1);
+		}
+		catch (NullPointerException e) {
+			System.out.println("p1COPoint: " + p1COPoint);
+			throw e;
+		}
 
 		child1.recalculateFitness();
 		child2.recalculateFitness();

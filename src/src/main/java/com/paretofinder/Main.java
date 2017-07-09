@@ -34,6 +34,54 @@ public class Main {
 		Mutation.mutate(children.get(1), p1);
 		System.out.println("CHILD2 AFTER MUTATION: \n" + children.get(1));
 
+		OperatorNode op1 = new OperatorNode();
+
+		while (op1.size() != 2) {
+			op1.randomize();
+		}
+
+		ConstantNode const1 = (ConstantNode)Node.getNode(Node.CONSTANT_NODE);
+		const1.setValue(1.0);
+		op1.setChild(0, const1);
+
+		ConstantNode const2 = (ConstantNode)Node.getNode(Node.CONSTANT_NODE);
+		const1.setValue(2.0);
+		op1.setChild(1, const2);
+
+		OperatorNode op3 = new OperatorNode();
+
+		while (op3.size() != 2) {
+			op3.randomize();
+		}
+
+		ConstantNode const3 = (ConstantNode)Node.getNode(Node.CONSTANT_NODE);
+		const3.setValue(3.0);
+		op3.setChild(0, const3);
+
+		ConstantNode const4 = (ConstantNode)Node.getNode(Node.CONSTANT_NODE);
+		const4.setValue(4.0);
+		op3.setChild(1, const4);
+
+		OperatorNode op2 = new OperatorNode();
+
+		while (op2.size() != 2) {
+			op2.randomize();
+		}
+
+		op2.setChild(0, op1);
+		op2.setChild(1, op3);
+
+		System.out.println("OPERATOR NODE BEFORE REDUCTION: " + op2.getValue(-1));
+		System.out.println(op2 + "\n" + op2.depthFirstSearch(1));
+		try {
+			op2.cleanUp();
+		}
+		catch(CannotReduceException e) {
+			e.printStackTrace();
+		}
+		System.out.println("OPERATOR NODE AFTER REDUCTION: " + op2.getValue(-1));
+		System.out.println(op2 + "\n" + op2.depthFirstSearch(1));
+
 		Individual best = gp.performOneIteration();
 		System.out.println("BEST AFTER ITERATION: \n" + best);
 	}
@@ -45,9 +93,8 @@ public class Main {
 			System.out.println("\n\u001B[34mNumber of Individuals:\u001B[0m " + GeneticProgram.NUM_INDIVIDUALS);
 
 			/////////////////////			TEST
-			// System.out.println("\u001B[32mFitness:\u001B[0m " + gp.getBestIndividual().getFitness());
-			// gp.getBestIndividual().printTree();
 			// test(gp);
+			// return;
 			/////////////////////			END TEST
 
 			gp.run();

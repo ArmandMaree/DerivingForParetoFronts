@@ -54,7 +54,7 @@ public class Tree {
 
 	public Node getNode(int index) {
 		if (index >= numNodes || index < 0) {
-			return null;
+			throw new IndexOutOfBoundsException("Index: " + index + "    Size: " + numNodes);
 		}
 
 		int counter = 0;
@@ -77,12 +77,16 @@ public class Tree {
 			counter++;
 		}
 
-		return null;
+		throw new RuntimeException("Node not found. Index: " + index + "   Size: " + size() + "   newSize: " + recalculateSize());
 	}
 
 	public void setNode(int index, Node node) {
+		if (node == null) {
+			throw new NullPointerException();
+		}
+
 		if (index >= numNodes || index < 0) {
-			return;
+			throw new IndexOutOfBoundsException("Index: " + index + "    Size: " + numNodes);
 		}
 
 		if (index == 0) { //  replace root node
@@ -99,13 +103,7 @@ public class Tree {
 				Node nodeInList = nodes.remove(0);
 
 				if (index == counter) {
-					try {
-						parents.get(0)._1.setChild(parents.get(0)._2, node);
-					}
-					catch(IndexOutOfBoundsException e) {
-						System.out.println("CRASH!!!! counter: " + parents.get(0)._2 + "   " + parents.get(0)._1);
-						System.exit(1);
-					}
+					parents.get(0)._1.setChild(parents.get(0)._2, node);
 				}
 
 				if (nodeInList instanceof OperatorNode) {
@@ -137,6 +135,20 @@ public class Tree {
 		returnTree.numNodes = this.numNodes;
 
 		return returnTree;
+	}
+
+	public void cleanUp() throws CannotReduceException {
+		try {
+			if (root instanceof OperatorNode) {
+				double value = root.cleanUp();
+				ConstantNode cn = (ConstantNode)Node.getNode(Node.CONSTANT_NODE);
+				cn.setValue(value);
+				root = cn;
+			}
+		}
+		finally {
+			recalculateSize();
+		}
 	}
 
 	@Override

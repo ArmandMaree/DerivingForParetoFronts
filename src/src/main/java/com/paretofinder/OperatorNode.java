@@ -66,7 +66,12 @@ public class OperatorNode extends Node {
 	}
 
 	public void setChild(int index, Node child) {
-		children.set(index, child);
+		if (child == null) {
+			throw new NullPointerException();
+		}
+		else {
+			children.set(index, child);
+		}
 	}
 
 	public Node clone() {
@@ -85,7 +90,51 @@ public class OperatorNode extends Node {
 	}
 
 	public int size() {
-		return (children == null) ? 0 : children.size();
+		return children.size();
+	}
+
+	public double cleanUp() throws CannotReduceException {
+		boolean containsVariableInSubtree = false;
+		ArrayList<Node> newChildren = new ArrayList<>();
+
+		for (int i = 0; i < children.size(); i++) {
+			try {
+				if (!(children.get(i) instanceof ConstantNode)) { // is not ConstantNode
+					double value = children.get(i).cleanUp();
+					ConstantNode cn = (ConstantNode)Node.getNode(Node.CONSTANT_NODE);
+					cn.setValue(value);
+					newChildren.add(cn);
+				}
+				else { // is ConstantNode
+					newChildren.add(children.get(i));
+				}
+			}
+			catch (CannotReduceException e) {
+				containsVariableInSubtree = true;
+				newChildren.add(children.get(i));
+			}
+
+			if (newChildren.get(newChildren.size() - 1) == null) {
+				throw new NullPointerException();
+			}
+		}
+
+		children = newChildren;
+
+		if (!containsVariableInSubtree) {
+
+			double returnValue = getValue(-1);
+
+			if (returnValue != returnValue) { // returnValue == NaN
+				return Double.MAX_VALUE;
+			}
+			else {
+				return returnValue;			
+			}
+		}
+		else {
+			throw new CannotReduceException();
+		}
 	}
 
 	@Override

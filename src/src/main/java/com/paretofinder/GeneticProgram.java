@@ -15,8 +15,8 @@ public class GeneticProgram {
 	public GeneticProgram(ArrayList<HashMap<String, Double>> points) {
 		Node.points = points;
 		Node.numVariables = points.get(0).size();
-		Node.minRange = -100.0;
-		Node.maxRange = 100.0;
+		Node.minRange = -10.0;
+		Node.maxRange = 10.0;
 
 		this.numPoints = points.size();
 
@@ -43,6 +43,10 @@ public class GeneticProgram {
 	}
 
 	public Individual performOneIteration() {
+		if (bestIndividual == null) {
+			bestIndividual = calculateBestIndividual();
+		}
+		
 		Individual bestIndividual = individuals.get(0);
 		ArrayList<Individual> newGeneration = new ArrayList<>();
 
@@ -86,14 +90,21 @@ public class GeneticProgram {
 		return bestIndividual;
 	}
 
+	public void introduceNewIndividuals() {
+		for (int i = (int)(individuals.size() * 0.75); i < individuals.size(); i++) {
+			individuals.set(i, new Individual());
+			individuals.get(i).recalculateFitness();
+		}
+	}
+
 	public void run() {
 		int lastProgressIteration = 0;
 		int currentIteration = 0;
 		bestIndividual = calculateBestIndividual();
 
-		while (lastProgressIteration < MAX_ITERATIONS_NO_PROGRESS) {
-			Mutation.modifyNodeProbability = 1.0 - lastProgressIteration / MAX_ITERATIONS_NO_PROGRESS;
-			Mutation.adaptNodeProbability = 1.0 - Mutation.modifyNodeProbability;
+		while (lastProgressIteration < MAX_ITERATIONS_NO_PROGRESS && bestIndividual.getFitness() != 0.0) {
+			// Mutation.modifyNodeProbability = 1.0 - lastProgressIteration / MAX_ITERATIONS_NO_PROGRESS;
+			// Mutation.adaptNodeProbability = 1.0 - Mutation.modifyNodeProbability;
 			Individual bestInIteration = performOneIteration();
 			// System.out.println("bestIndividual: " + bestIndividual.getFitness());
 			// System.out.println("bestInIteration: " + bestInIteration.getFitness());
@@ -109,7 +120,7 @@ public class GeneticProgram {
 			currentIteration++;
 
 			if (currentIteration % 1 == 0) {
-				System.out.print("\rcurrentIteration: " + currentIteration + "   lastUpdate: " + lastProgressIteration + "  bestFitness: " + bestIndividual.getFitness() + "                        ");
+				System.out.print("\rcurrentIteration: " + currentIteration + "   lastUpdate: " + lastProgressIteration + "  bestFitness: " + bestIndividual.getFitness() + "    bestIndividual #nodes: " + bestIndividual.size() + "                        ");
 
 				// try {
 				// 	Thread.sleep(200);
@@ -117,6 +128,16 @@ public class GeneticProgram {
 				// catch (InterruptedException e) {
 					
 				// }
+			}
+
+			if (currentIteration % 1000 == 0) {
+				for (Individual individual : individuals) {
+					individual.cleanUp();
+				}
+			}
+
+			if (lastProgressIteration % 10000 == 0 && lastProgressIteration != 0) {
+				introduceNewIndividuals();
 			}
 		}
 

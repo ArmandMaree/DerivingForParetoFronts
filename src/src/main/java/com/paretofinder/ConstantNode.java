@@ -32,6 +32,10 @@ public class ConstantNode extends Node {
 		return cNode;
 	}
 
+	public double cleanUp() throws CannotReduceException {
+		return getValue(-1);
+	}
+
 	@Override
 	public String toString() {
 		return "CONST=" + value;

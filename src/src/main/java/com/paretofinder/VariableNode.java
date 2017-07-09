@@ -27,6 +27,10 @@ public class VariableNode extends Node {
 		return vNode;
 	}
 
+	public double cleanUp() throws CannotReduceException {
+		throw new CannotReduceException("Variable " + variableName + " found.");
+	}
+
 	@Override
 	public String toString() {
 		return "VARIA=" + variableName;

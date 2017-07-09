@@ -49,7 +49,7 @@ public class Individual {
 			return Double.MAX_VALUE;
 		}
 
-		return fitness * size();
+		return fitness + size();
 	}
 
 	public int size() {
@@ -67,8 +67,8 @@ public class Individual {
 	}
 
 	public Node getNode(int index) {
-		if (index < 0 || index > size()) {
-			return null;
+		if (index >= size() || index < 0) {
+			throw new IndexOutOfBoundsException("Index: " + index + "    Size: " + size());
 		}
 
 		if (index < lhs.size()) {
@@ -80,8 +80,12 @@ public class Individual {
 	}
 
 	public void setNode(int index, Node node) {
-		if (index < 0 || index > size()) {
-			return;
+		if (node == null) {
+			throw new NullPointerException();
+		}
+		
+		if (index >= size() || index < 0) {
+			throw new IndexOutOfBoundsException("Index: " + index + "    Size: " + size());
 		}
 
 		if (index < lhs.size()) {
@@ -100,6 +104,19 @@ public class Individual {
 		System.out.println(lhs);
 		System.out.println("  RHS:");
 		System.out.println(rhs);
+	}
+
+	public void cleanUp() {
+		try {
+			lhs.cleanUp();
+		}
+		catch (CannotReduceException e) {
+		}
+
+		try {
+			rhs.cleanUp();
+		}
+		catch (CannotReduceException ignore) {}
 	}
 
 	@Override
