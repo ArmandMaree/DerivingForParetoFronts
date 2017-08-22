@@ -1,27 +1,40 @@
 package com.paretofinder;
 
 import java.util.Random;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 public class VariableNode extends Node {
-	private int numVariables;
 	protected String variableName;
 	private Random rand = new Random();
 
-	public VariableNode(int numVariables) {
-		this.numVariables = numVariables;
+	public VariableNode() {
 	}
 
 	public void randomize() {
-		// variableName = "x" + rand.nextInt(numVariables);
-		variableName = "x" + rand.nextInt(numVariables - 1);
+		ArrayList<String> variables;
+
+		if (parent == null) {
+			variables = Node.variables;
+		}
+		else {
+			variables = parent.getVariables();
+		}
+
+		variableName = variables.get(rand.nextInt(variables.size() - 1));
 	}
 
-	public double getValue(int pointIndex) {
-		return Node.getVariableValue(pointIndex, variableName);
+	public double getValue(int pointIndex, HashMap<String, Double> variableValues) {
+		if (parent == null) {
+			return Node.points.get(pointIndex).get(variableName);
+		}
+		else {
+			return parent.getVariableValue(pointIndex, variableName);
+		}
 	}
 
 	public Node clone() {
-		VariableNode vNode = new VariableNode(this.numVariables);
+		VariableNode vNode = new VariableNode();
 		vNode.variableName = this.variableName;
 
 		return vNode;

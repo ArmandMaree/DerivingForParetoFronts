@@ -2,13 +2,18 @@ package com.paretofinder;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class OperatorNode extends Node {
 	private int operatorIndex;
-	private char[] possibleOperators = {'+', '-', '*', '/', '^', '#'};
-	private char[] operatorNumOperands = {2, 2, 2, 2, 2, 1};
+	private char[] possibleOperators = {'+', '-', '*', '/', '^', '#', '&'};
+	private char[] operatorNumOperands = {2, 2, 2, 2, 2, 1, 1};
 	private ArrayList<Node> children = new ArrayList<>();
 	private Random rand = new Random();
+	private String counterVariable = null;
+	private int endValueCounter = 10;
+	private int startValueCounter = 1;
 
 	public OperatorNode() {
 
@@ -26,33 +31,79 @@ public class OperatorNode extends Node {
 
 			while(children.size() < operatorNumOperands[operatorIndex]) {
 				Node child = Node.getRandomLeafNode();
+				child.parent = this;
 				child.randomize();
 				children.add(child);
 			}
 		}
 	}
 
-	public double getValue(int pointIndex) {
-		double value = children.get(0).getValue(pointIndex);
+	public ArrayList<String> getVariables() {
+		ArrayList<String> variables = new ArrayList<>();
+
+		if (parent != null) {
+			for (String value : parent.getVariables()) {
+				variables.add(new String(value));
+			}
+		}
+		else {
+			for (String value : super.getVariables()) {
+				variables.add(new String(value));
+			}
+		}
+
+		if (operatorIndex == 6) {
+			variables.add(variables.size() - 1, counterVariable);
+		}
+		
+		return variables;
+	}
+
+	public double getValue(int pointIndex, HashMap<String, Double> variableValues) {
+		double value = 0.0;
+
+		if (variableValues == null) {
+			if (pointIndex != -1) {
+				variableValues = Node.points.get(pointIndex);
+			}
+			else {
+				variableValues = new HashMap<>();
+			}
+		}
 
 		switch (operatorIndex) {
 			case 0: // +
-				value = children.get(0).getValue(pointIndex) + children.get(1).getValue(pointIndex);
+				value = children.get(0).getValue(pointIndex, variableValues) + children.get(1).getValue(pointIndex, variableValues);
 				break;
 			case 1: // -
-				value = children.get(0).getValue(pointIndex) - children.get(1).getValue(pointIndex);
+				value = children.get(0).getValue(pointIndex, variableValues) - children.get(1).getValue(pointIndex, variableValues);
 				break;
 			case 2: // *
-				value = children.get(0).getValue(pointIndex) * children.get(1).getValue(pointIndex);
+				value = children.get(0).getValue(pointIndex, variableValues) * children.get(1).getValue(pointIndex, variableValues);
 				break;
 			case 3: // /
-				value = children.get(0).getValue(pointIndex) / children.get(1).getValue(pointIndex);
+				value = children.get(0).getValue(pointIndex, variableValues) / children.get(1).getValue(pointIndex, variableValues);
 				break;
 			case 4: // ^ power
-				value = Math.pow(children.get(0).getValue(pointIndex), children.get(1).getValue(pointIndex));
+				value = Math.pow(children.get(0).getValue(pointIndex, variableValues), children.get(1).getValue(pointIndex, variableValues));
 				break;
 			case 5: // # square root
-				value = Math.sqrt(children.get(0).getValue(pointIndex));
+				value = Math.sqrt(children.get(0).getValue(pointIndex, variableValues));
+				break;
+			case 6: // & sigma summation
+				HashMap<String, Double> variableValuesLocal = new HashMap<>();
+				Iterator<String> it = variableValues.keySet().iterator();
+
+				while (it.hasNext()) {
+					String key = it.next();
+					variableValuesLocal.put(key, variableValuesLocal.get(key));
+				}
+
+				for (int i = startValueCounter; i <= endValueCounter; i++) {
+					variableValues.put(counterVariable, new Double(i));
+					value += children.get(0).getValue(pointIndex, variableValues);				
+				}
+				
 				break;
 			default:
 				System.out.println("Invalid operator: " + operatorIndex);
@@ -122,8 +173,7 @@ public class OperatorNode extends Node {
 		children = newChildren;
 
 		if (!containsVariableInSubtree) {
-
-			double returnValue = getValue(-1);
+			double returnValue = getValue(-1, null);
 
 			if (returnValue != returnValue) { // returnValue == NaN
 				return Double.MAX_VALUE;
@@ -139,7 +189,13 @@ public class OperatorNode extends Node {
 
 	@Override
 	public String toString() {
-		return "OPERA=" + possibleOperators[operatorIndex];
+		String s = "OPERA=" + possibleOperators[operatorIndex];
+
+		if (operatorIndex == 6) {
+		 	s += "   [" + startValueCounter + "," + endValueCounter + "]";
+		}
+
+		return  s;
 	}
 
 	public String depthFirstSearch(int depth) {

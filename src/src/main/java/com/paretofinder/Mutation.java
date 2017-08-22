@@ -23,7 +23,16 @@ public class Mutation {
 						ConstantNode cNode = (ConstantNode)node;
 
 						if (individual.getFitness() > bestIndividual.getFitness()) {
-							double newValue = cNode.getValue(i) + (Node.maxRange - Node.minRange) * (bestIndividual.getFitness() / individual.getFitness()) * (rand.nextDouble() * 2 - 1);
+							double newValue = cNode.getValue(i, null);
+
+							if (rand.nextDouble() > 0.5) {
+								newValue += (Node.maxRange - Node.minRange) * ((individual.getFitness() - bestIndividual.getFitness()) / bestIndividual.getFitness()); // * ( * 2 - 1)
+							}
+							else {
+								newValue -= (Node.maxRange - Node.minRange) * ((individual.getFitness() - bestIndividual.getFitness()) / bestIndividual.getFitness()); // * ( * 2 - 1)
+
+							}
+
 							cNode.setValue(newValue);
 							changed = true;
 							// System.out.println("Changed Const by: " + newValue + "    " + (bestIndividual.getFitness() / individual.getFitness()));
@@ -31,6 +40,7 @@ public class Mutation {
 					}
 				}
 				else if (mutationTypeProbability < adaptNodeProbability + modifyNodeProbability) {  // elseif to ensure future scalability
+					// System.out.println("MUTATE");
 					Node randomNode = Node.getRandomNode();
 					randomNode.randomize();
 					individual.setNode(i, randomNode);
@@ -44,5 +54,35 @@ public class Mutation {
 		if (changed) {
 			individual.recalculateFitness();
 		}
+	}
+
+	public static Individual modifyConstants(Individual individual) {
+		Individual clone = individual.clone();
+		boolean changed = false;
+
+		for (int i = 0; i < clone.size(); i++) {
+			Node node = clone.getNode(i);
+					
+			if (node instanceof ConstantNode) {
+				ConstantNode cNode = (ConstantNode)node;
+				double newValue = cNode.getValue(i, null);
+
+				if (rand.nextDouble() > 0.5) {
+					newValue += (rand.nextDouble() * 2 - 1) / 5;
+				}
+				else {
+					newValue -= (rand.nextDouble() * 2 - 1) / 5;
+				}
+
+				cNode.setValue(newValue);
+				changed = true;
+			}
+		}
+
+		if (changed) {
+			clone.recalculateFitness();
+		}
+
+		return clone;
 	}
 }

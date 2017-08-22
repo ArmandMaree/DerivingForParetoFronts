@@ -10,8 +10,10 @@ public class Individual {
 		rhs = new Tree();
 		lhs.randomize();
 		// rhs.randomize();
-		VariableNode root = new VariableNode(Node.numVariables);
-		root.variableName = "x" + (Node.numVariables - 1);
+		VariableNode root = new VariableNode();
+		// System.out.println("SIZE: " + Node.variables.size());
+		root.variableName = Node.variables.get(Node.variables.size() - 1);
+		// System.out.println("RHS=" + root.variableName);
 		rhs.root = root;
 		recalculateFitness();
 	}

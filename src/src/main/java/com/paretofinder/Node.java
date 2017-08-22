@@ -10,9 +10,12 @@ public class Node {
 	public static final int CONSTANT_NODE = 2;
 
 	public static int numVariables;
+	public static ArrayList<String> variables;
 	public static double minRange;
 	public static double maxRange;
 	public static ArrayList<HashMap<String, Double>> points;
+
+	public Node parent = null;
 
 	public static Random rand = new Random();
 
@@ -21,7 +24,7 @@ public class Node {
 			case OPERATOR_NODE:
 				return new OperatorNode();
 			case VARIABLE_NODE:
-				return new VariableNode(numVariables); 
+				return new VariableNode(); 
 			case CONSTANT_NODE:
 				return new ConstantNode(minRange, maxRange);
 			default:
@@ -38,7 +41,7 @@ public class Node {
 
 		switch (nodeType) {
 			case VARIABLE_NODE:
-				return new VariableNode(numVariables);
+				return new VariableNode();
 			case CONSTANT_NODE:
 				return new ConstantNode(minRange, maxRange);
 			default:
@@ -46,11 +49,20 @@ public class Node {
 		}
 	}
 
+	public ArrayList<String> getVariables() {
+		if (parent == null) {
+			return variables;
+		}
+		else {
+			return parent.getVariables();
+		}
+	}
+
 	public static double getVariableValue(int pointIndex, String variableName) {
 		return points.get(pointIndex).get(variableName);
 	}
 
-	public double getValue(int pointIndex) {
+	public double getValue(int pointIndex, HashMap<String, Double> variableValues) {
 		return Double.MAX_VALUE;
 	}
 
@@ -63,7 +75,7 @@ public class Node {
 	}
 
 	public double cleanUp() throws CannotReduceException {
-		throw new RuntimeException("Node reduction not implemented for " + this.getClass().getName());
+		throw new RuntimeException("cleanUp not implemented for " + this.getClass().getName());
 	}
 
 	@Override

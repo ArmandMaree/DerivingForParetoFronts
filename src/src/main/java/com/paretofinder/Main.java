@@ -71,7 +71,7 @@ public class Main {
 		op2.setChild(0, op1);
 		op2.setChild(1, op3);
 
-		System.out.println("OPERATOR NODE BEFORE REDUCTION: " + op2.getValue(-1));
+		System.out.println("OPERATOR NODE BEFORE REDUCTION: " + op2.getValue(-1, null));
 		System.out.println(op2 + "\n" + op2.depthFirstSearch(1));
 		try {
 			op2.cleanUp();
@@ -79,7 +79,7 @@ public class Main {
 		catch(CannotReduceException e) {
 			e.printStackTrace();
 		}
-		System.out.println("OPERATOR NODE AFTER REDUCTION: " + op2.getValue(-1));
+		System.out.println("OPERATOR NODE AFTER REDUCTION: " + op2.getValue(-1, null));
 		System.out.println(op2 + "\n" + op2.depthFirstSearch(1));
 
 		Individual best = gp.performOneIteration();
@@ -89,6 +89,14 @@ public class Main {
 	public static void main(String[] args) {
 		try {
 			ArrayList<HashMap<String, Double>> points = getPoints();
+			Node.variables = new ArrayList<>();
+			Iterator<String> it = points.get(0).keySet().iterator();
+			// it.next();
+
+			while (it.hasNext()) {
+				Node.variables.add(it.next());
+			}
+
 			GeneticProgram gp = new GeneticProgram(points);
 			System.out.println("\n\u001B[34mNumber of Individuals:\u001B[0m " + GeneticProgram.NUM_INDIVIDUALS);
 

@@ -26,7 +26,7 @@ public class Tree {
 	}
 
 	public double evaluate(int pointIndex) {
-		return root.getValue(pointIndex);
+		return root.getValue(pointIndex, null);
 	}
 
 	public int size() {

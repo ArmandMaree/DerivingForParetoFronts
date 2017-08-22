@@ -1,6 +1,7 @@
 package com.paretofinder;
 
 import java.util.Random;
+import java.util.HashMap;
 
 public class ConstantNode extends Node {
 	private double min;
@@ -17,7 +18,7 @@ public class ConstantNode extends Node {
 		value = rand.nextDouble() * (max - min) + min;
 	}
 
-	public double getValue(int pointIndex) {
+	public double getValue(int pointIndex, HashMap<String, Double> variableValues) {
 		return value;
 	}
 
@@ -33,7 +34,7 @@ public class ConstantNode extends Node {
 	}
 
 	public double cleanUp() throws CannotReduceException {
-		return getValue(-1);
+		return getValue(-1, null);
 	}
 
 	@Override
